@@ -7,12 +7,21 @@ All balance mutations go through here to ensure:
   - Consistent validation
 """
 import logging
+from functools import partial
 from decimal import Decimal
 
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+from .notifications import (
+    notify_deposit,
+    notify_transfer_receiver,
+    notify_transfer_sender,
+    notify_withdrawal,
+)
+
+
 
 from accounts.models import BankAccount
 from .models import Transaction
@@ -119,7 +128,26 @@ def process_deposit(account_id: int, amount: Decimal, reference: str = "") -> Tr
         account.save(update_fields=["balance", "updated_at"])
         txn.status = Transaction.TransactionStatus.COMPLETED
         txn.save(update_fields=["status"])
-        logger.info("Deposit completed: txn=%s account=%s amount=%s", txn.transaction_id, account.account_number, amount)
+        logger.info("Deposit completed: txn=%s account=%s amount=%s", 
+            txn.transaction_id, 
+            account.account_number, 
+            amount
+        )
+
+        # Schedule email AFTER the DB transaction commits — never fires on rollback
+        customer = account.customer
+        if customer.email:
+            transaction.on_commit(partial(
+                notify_deposit,
+                recipient_email=customer.email,
+                recipient_name=customer.get_full_name() or customer.username,
+                account_number=account.account_number,
+                amount=amount,
+                new_balance=account.balance,
+                transaction_id=str(txn.transaction_id),
+                reference=reference,
+                timestamp=txn.timestamp,
+            ))
     except Exception as exc:
         txn.status = Transaction.TransactionStatus.FAILED
         txn.metadata["error"] = str(exc)
@@ -145,8 +173,9 @@ def process_withdrawal(account_id: int, amount: Decimal, reference: str = "") ->
 
     if account.balance < amount:
         raise InsufficientFundsError(
-            f"Insufficient balance. Available: {account.balance}, Requested: {amount}."
-        )
+        "Insufficient balance for withdrawal.",
+        account.balance
+    )
 
     _check_daily_limit(account, amount)
 
@@ -163,7 +192,25 @@ def process_withdrawal(account_id: int, amount: Decimal, reference: str = "") ->
         account.save(update_fields=["balance", "updated_at"])
         txn.status = Transaction.TransactionStatus.COMPLETED
         txn.save(update_fields=["status"])
-        logger.info("Withdrawal completed: txn=%s account=%s amount=%s", txn.transaction_id, account.account_number, amount)
+        logger.info("Withdrawal completed: txn=%s account=%s amount=%s", 
+            txn.transaction_id, 
+            account.account_number, 
+            amount
+        )
+
+        customer = account.customer
+        if customer.email:
+            transaction.on_commit(partial(
+                notify_withdrawal,
+                recipient_email=customer.email,
+                recipient_name=customer.get_full_name() or customer.username,
+                account_number=account.account_number,
+                amount=amount,
+                new_balance=account.balance,
+                transaction_id=str(txn.transaction_id),
+                reference=reference,
+                timestamp=txn.timestamp,
+            ))
     except Exception as exc:
         txn.status = Transaction.TransactionStatus.FAILED
         txn.metadata["error"] = str(exc)
@@ -229,6 +276,36 @@ def process_transfer(from_account_id: int, to_account_id: int, amount: Decimal, 
             "Transfer completed: txn=%s from=%s to=%s amount=%s",
             txn.transaction_id, from_account.account_number, to_account.account_number, amount,
         )
+        sender = from_account.customer
+        if sender.email:
+            transaction.on_commit(partial(
+                notify_transfer_sender,
+                recipient_email=sender.email,
+                recipient_name=sender.get_full_name() or sender.username,
+                from_account_number=from_account.account_number,
+                to_account_number=to_account.account_number,
+                amount=amount,
+                new_balance=from_account.balance,
+                transaction_id=str(txn.transaction_id),
+                reference=reference,
+                timestamp=txn.timestamp,
+            ))
+
+        # Notify receiver (only if different person from sender)
+        receiver = to_account.customer
+        if receiver.email and receiver.pk != sender.pk:
+            transaction.on_commit(partial(
+                notify_transfer_receiver,
+                recipient_email=receiver.email,
+                recipient_name=receiver.get_full_name() or receiver.username,
+                from_account_number=from_account.account_number,
+                to_account_number=to_account.account_number,
+                amount=amount,
+                new_balance=to_account.balance,
+                transaction_id=str(txn.transaction_id),
+                reference=reference,
+                timestamp=txn.timestamp,
+            ))
     except Exception as exc:
         txn.status = Transaction.TransactionStatus.FAILED
         txn.metadata["error"] = str(exc)

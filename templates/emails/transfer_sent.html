@@ -1,0 +1,47 @@
+{% extends "emails/base.html" %}
+
+{% block badge %}
+  <span class="badge" style="background:#e9d8fd; color:#44337a;">→ Transfer Sent</span>
+{% endblock %}
+
+{% block content %}
+  <p class="greeting">Dear {{ recipient_name }},</p>
+  <p style="color:#4a5568; font-size:15px;">
+    Your transfer has been successfully processed.
+  </p>
+
+  <div class="amount-box" style="border-left-color:#805ad5;">
+    <div class="label">Amount Transferred</div>
+    <div class="amount" style="color:#553c9a;">-{{ amount }}</div>
+  </div>
+
+  <table class="details-table">
+    <tr>
+      <td>From Account</td>
+      <td>{{ from_account_number }}</td>
+    </tr>
+    <tr>
+      <td>To Account</td>
+      <td>{{ to_account_number }}</td>
+    </tr>
+    <tr>
+      <td>Transaction ID</td>
+      <td style="font-family:monospace; font-size:12px;">{{ transaction_id }}</td>
+    </tr>
+    <tr>
+      <td>Date &amp; Time</td>
+      <td>{{ timestamp|date:"N j, Y" }} at {{ timestamp|time:"H:i" }} UTC</td>
+    </tr>
+    {% if reference %}
+    <tr>
+      <td>Reference</td>
+      <td>{{ reference }}</td>
+    </tr>
+    {% endif %}
+  </table>
+
+  <div class="balance-box" style="background:#faf5ff;">
+    <span class="label" style="color:#553c9a;">Remaining Balance</span>
+    <span class="value" style="color:#6b46c1;">{{ new_balance }}</span>
+  </div>
+{% endblock %}

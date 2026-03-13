@@ -1,0 +1,43 @@
+{% extends "emails/base.html" %}
+
+{% block badge %}
+  <span class="badge" style="background:#c6f6d5; color:#22543d;">✓ Deposit Confirmed</span>
+{% endblock %}
+
+{% block content %}
+  <p class="greeting">Dear {{ recipient_name }},</p>
+  <p style="color:#4a5568; font-size:15px;">
+    We're pleased to confirm that a deposit has been successfully credited to your account.
+  </p>
+
+  <div class="amount-box">
+    <div class="label">Amount Credited</div>
+    <div class="amount" style="color:#276749;">+{{ amount }}</div>
+  </div>
+
+  <table class="details-table">
+    <tr>
+      <td>Account Number</td>
+      <td>{{ account_number }}</td>
+    </tr>
+    <tr>
+      <td>Transaction ID</td>
+      <td style="font-family:monospace; font-size:12px;">{{ transaction_id }}</td>
+    </tr>
+    <tr>
+      <td>Date &amp; Time</td>
+      <td>{{ timestamp|date:"N j, Y" }} at {{ timestamp|time:"H:i" }} UTC</td>
+    </tr>
+    {% if reference %}
+    <tr>
+      <td>Reference</td>
+      <td>{{ reference }}</td>
+    </tr>
+    {% endif %}
+  </table>
+
+  <div class="balance-box">
+    <span class="label">Updated Account Balance</span>
+    <span class="value">{{ new_balance }}</span>
+  </div>
+{% endblock %}

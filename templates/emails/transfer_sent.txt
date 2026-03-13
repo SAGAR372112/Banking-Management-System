@@ -1,0 +1,19 @@
+{{ bank_name }} — Transfer Confirmation
+========================================
+
+Dear {{ recipient_name }},
+
+Your transfer has been successfully processed.
+
+  Amount Transferred : -{{ amount }}
+  From Account       : {{ from_account_number }}
+  To Account         : {{ to_account_number }}
+  Transaction ID     : {{ transaction_id }}
+  Date & Time        : {{ timestamp|date:"N j, Y" }} at {{ timestamp|time:"H:i" }} UTC
+{% if reference %}  Reference          : {{ reference }}
+{% endif %}
+Remaining Balance    : {{ new_balance }}
+
+If you did not authorise this transaction, please contact us immediately.
+
+This is an automated message from {{ bank_name }}. Please do not reply.

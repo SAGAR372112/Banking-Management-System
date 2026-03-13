@@ -47,10 +47,10 @@ class DepositSerializer(serializers.Serializer):
         allow_blank=True
     )
 
-    def validate_amount(self, value: Decimal) -> Decimal:
-        if value <= 0:
+    def validate_amount(self, amount: Decimal) -> Decimal:
+        if amount <= 0:
             raise serializers.ValidationError("Deposit amount must be positive.")
-        return value
+        return amount
 
 
 class WithdrawSerializer(serializers.Serializer):

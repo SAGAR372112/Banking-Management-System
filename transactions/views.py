@@ -127,9 +127,13 @@ class TransferView(APIView):
         responses={200: TransactionSerializer},
     )
     def post(self, request):
+        print('start')
         serializer = TransferSerializer(data=request.data)
+        print('1')
         serializer.is_valid(raise_exception=True)
+        print('2')
         data = serializer.validated_data
+        print('3')
 
         from_account: BankAccount = data["from_account"]
         # Customers may only transfer from their own accounts

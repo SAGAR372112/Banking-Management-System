@@ -1,0 +1,18 @@
+{{ bank_name }} — Withdrawal Confirmation
+=========================================
+
+Dear {{ recipient_name }},
+
+A withdrawal has been processed from your account.
+
+  Amount Debited  : -{{ amount }}
+  Account Number  : {{ account_number }}
+  Transaction ID  : {{ transaction_id }}
+  Date & Time     : {{ timestamp|date:"N j, Y" }} at {{ timestamp|time:"H:i" }} UTC
+{% if reference %}  Reference       : {{ reference }}
+{% endif %}
+Remaining Balance : {{ new_balance }}
+
+If you did not authorise this transaction, please contact us immediately.
+
+This is an automated message from {{ bank_name }}. Please do not reply.

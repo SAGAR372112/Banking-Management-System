@@ -1,0 +1,19 @@
+{{ bank_name }} — Transfer Received
+=====================================
+
+Dear {{ recipient_name }},
+
+A transfer has been credited to your account.
+
+  Amount Received  : +{{ amount }}
+  Sent From        : {{ from_account_number }}
+  Credited To      : {{ to_account_number }}
+  Transaction ID   : {{ transaction_id }}
+  Date & Time      : {{ timestamp|date:"N j, Y" }} at {{ timestamp|time:"H:i" }} UTC
+{% if reference %}  Reference        : {{ reference }}
+{% endif %}
+Updated Balance    : {{ new_balance }}
+
+If you did not authorise this transaction, please contact us immediately.
+
+This is an automated message from {{ bank_name }}. Please do not reply.

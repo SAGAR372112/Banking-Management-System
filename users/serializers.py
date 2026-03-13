@@ -67,9 +67,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = [
             "id", "username", "email", "first_name", 
             "last_name", "phone", "address", 
-            "role", "account_number", "date_joined"
+            "role", "date_joined"
         ]
-        read_only_fields = ["id", "username", "role", "account_number", "date_joined"]
+        read_only_fields = ["id", "username", "role", "date_joined"]
 
 
 class UserMinimalSerializer(serializers.ModelSerializer):
@@ -77,5 +77,5 @@ class UserMinimalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "account_number"]
+        fields = ["id", "username", "first_name", "last_name"]
         read_only_fields = fields
