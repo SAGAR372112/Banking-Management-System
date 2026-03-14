@@ -67,7 +67,10 @@ class DepositView(APIView):
             )
 
         return Response(
-            TransactionSerializer(txn).data, 
+            {
+                "message": "Deposit successfully",
+                "transaction_id": str(txn.id),
+            }, 
             status=status.HTTP_200_OK
         )
 
@@ -108,7 +111,10 @@ class WithdrawView(APIView):
             )
 
         return Response(
-            TransactionSerializer(txn).data, 
+            {
+                "message": "Withdraw successfully",
+                "transaction_id": str(txn.id)
+            }, 
             status=status.HTTP_200_OK
         )
 
@@ -127,13 +133,9 @@ class TransferView(APIView):
         responses={200: TransactionSerializer},
     )
     def post(self, request):
-        print('start')
         serializer = TransferSerializer(data=request.data)
-        print('1')
         serializer.is_valid(raise_exception=True)
-        print('2')
         data = serializer.validated_data
-        print('3')
 
         from_account: BankAccount = data["from_account"]
         # Customers may only transfer from their own accounts
@@ -162,7 +164,10 @@ class TransferView(APIView):
             )
 
         return Response(
-            TransactionSerializer(txn).data, 
+            {
+                "message": "Transfer completed successfully",
+                "transaction_id": str(txn.id)
+            }, 
             status=status.HTTP_200_OK
         )
 

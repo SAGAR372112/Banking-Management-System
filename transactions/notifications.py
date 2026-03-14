@@ -22,8 +22,8 @@ from django.utils import timezone
 logger = logging.getLogger("bank")
 
 # Fallback sender — override via settings.DEFAULT_FROM_EMAIL
-DEFAULT_FROM = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@bankmanagement.com")
-
+DEFAULT_FROM = getattr(settings, "DEFAULT_FROM_EMAIL", "nanerasagar53@gmail.com")
+print(DEFAULT_FROM)
 
 def _send(
     subject: str,
@@ -44,7 +44,7 @@ def _send(
         )
         msg.attach_alternative(html_body, "text/html")
         msg.send(fail_silently=False)
-        logger.info("Email sent: subject=%r to=%s", subject, to_email)
+        logger.info("Email sent successfully")
     except Exception as exc:
         logger.exception("Failed to send email to %s: %s", to_email, exc)
 
