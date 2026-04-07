@@ -1,0 +1,58 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.tox/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Django
+db.sqlite3
+*.sqlite3
+staticfiles/
+media/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+docker/
+
+# Docs
+README.md
+docs/
+
+# Logs
+*.log
+logs/
+
+# Environment files (never bake secrets into the image)
+.env
+.env.*
+!.env.example
